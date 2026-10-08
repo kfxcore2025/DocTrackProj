@@ -1,0 +1,213 @@
+﻿@{
+    ViewData["Title"] = "For Signature";
+    var documentsForSignature = ViewBag.DocumentsForSignature as List<DocTrackProj.Models.Document>;
+    var pendingCount = ViewBag.PendingDocuments ?? 0;
+    var forSignatureCount = ViewBag.ForSignatureDocuments ?? 0;
+}
+
+<link rel="stylesheet"
+      href="~/css/admin.css"
+      asp-append-version="true" />
+
+<div class="admin-layout">
+    <!-- SIDEBAR -->
+    <partial name="_AdminSidebar" />>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <!-- TOP HEADER -->
+        <header class="top-header">
+            <div>
+                <h1>For Signature</h1>
+                <p>@DateTime.Now.ToString("dddd, MMMM dd, yyyy")</p>
+            </div>
+
+            <!-- NOTIFICATION (FULLY FIXED) -->
+            <div class="notification-wrapper">
+                <button class="notification" id="notificationButton" type="button">
+                    🔔
+                    @if (ViewBag.NotificationCount > 0)
+                    {
+                        <span class="notification-count">@ViewBag.NotificationCount</span>
+                    }
+                </button>
+
+                <!-- NOTIFICATION POPUP - FULL VERSION -->
+                <div class="notification-popup" id="notificationPopup">
+                    <div class="notification-header">
+                        <h3>Notifications</h3>
+                        <span>@ViewBag.NotificationCount</span>
+                    </div>
+                    <div class="notification-list">
+                        @if (ViewBag.Notifications != null &&
+                                                ((List<DocTrackProj.Models.Document>)ViewBag.Notifications).Any())
+                        {
+                            foreach (var notification in (List<DocTrackProj.Models.Document>)ViewBag.Notifications)
+                            {
+                                <div class="notification-item">
+                                    <div class="notification-icon">
+                                        @if (notification.Status == "Pending")
+                                        {
+                                            <span>✓</span>
+                                        }
+                                        else
+                                        {
+                                            <span>✎</span>
+                                        }
+                                    </div>
+                                    <div class="notification-text">
+                                        @if (notification.Status == "Pending")
+                                        {
+                                            <strong>Document for Approval</strong>
+                                            <p>@notification.DocumentName is waiting for approval.</p>
+                                        }
+                                        else
+                                        {
+                                            <strong>Document for Signature</strong>
+                                            <p>@notification.DocumentName requires your signature.</p>
+                                        }
+                                        <small>@notification.DateSubmitted.ToString("MMM dd, yyyy hh:mm tt")</small>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="no-notifications">
+                                <div>🎉</div>
+                                <p>No new notifications</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- PAGE BODY -->
+        <div class="dashboard-body">
+            <!-- INFO BANNER -->
+            <div class="info-banner">
+                <div class="info-icon">ℹ️</div>
+                <div>
+                    <strong>Physical Signature Required.</strong>
+                    Documents listed here need your physical signature.
+                    Please handle the printed documents accordingly, then mark them as Signed below.
+                </div>
+            </div>
+
+            <!-- DOCUMENTS TABLE -->
+            <div class="documents-card">
+                <div class="documents-header">
+                    <h2>Documents for Signature</h2>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>TRACKING CODE</th>
+                                <th>DOCUMENT NAME</th>
+                                <th>FROM DEPARTMENT</th>
+                                <th>TO DEPARTMENT</th>
+                                <th>STATUS</th>
+                                <th>DATE SUBMITTED</th>
+                                <th>ACTIONS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (documentsForSignature != null && documentsForSignature.Any())
+                            {
+                                foreach (var doc in documentsForSignature)
+                                {
+                                    <tr>
+                                        <td class="tracking-code">@doc.TrackingCode</td>
+                                        <td>@doc.DocumentName</td>
+                                        <td>@doc.FromOffice?.OfficeName</td>
+                                        <td>@doc.ToOffice?.OfficeName</td>
+                                        <td>
+                                            @if (doc.Status == "For Signature")
+                                            {
+                                                <span class="status signature">● For Signature</span>
+                                            }
+                                            else if (doc.Status == "Signed")
+                                            {
+                                                <span class="status approved">● Signed</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="status">@doc.Status</span>
+                                            }
+                                        </td>
+                                        <td>@doc.DateSubmitted.ToString("MMM dd, yyyy hh:mm tt")</td>
+                                        <td class="actions">
+                                            <a href="/Admin/ViewDocument/@doc.Id" class="btn-view">View</a>
+
+                                            @if (doc.Status == "For Signature")
+                                            {
+                                                <button class="btn-mark-signed"
+                                                        onclick="markAsSigned('@doc.Id', '@doc.TrackingCode')">
+                                                    Mark Signed
+                                                </button>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="7" class="no-documents">
+                                        No documents pending signature.
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- NOTIFICATION SCRIPT - FIXED -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const notificationButton = document.getElementById("notificationButton");
+        const notificationPopup = document.getElementById("notificationPopup");
+
+        if (notificationButton && notificationPopup) {
+            notificationButton.addEventListener("click", function (e) {
+                e.stopPropagation();
+                notificationPopup.classList.toggle("show");
+            });
+
+            document.addEventListener("click", function (e) {
+                if (!notificationPopup.contains(e.target) &&
+                    !notificationButton.contains(e.target)) {
+                    notificationPopup.classList.remove("show");
+                }
+            });
+        }
+    });
+</script>
+
+<!-- Mark as Signed Script -->
+<script>
+    function markAsSigned(id, trackingCode) {
+        if (confirm(`Mark document ${trackingCode} as Signed?`)) {
+            fetch(`/Admin/MarkAsSigned/${id}`, {
+                method: 'POST',
+                headers: { 'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value }
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert("Document marked as signed successfully.");
+                    location.reload();
+                } else {
+                    alert("Failed to mark as signed.");
+                }
+            })
+            .catch(() => alert("An error occurred."));
+        }
+    }
+</script>

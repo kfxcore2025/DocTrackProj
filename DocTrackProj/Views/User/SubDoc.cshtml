@@ -1,0 +1,83 @@
+﻿@{
+    ViewData["Title"] = "Submit Document";
+}
+
+<partial name="_UserSidebar" />
+
+<main class="main-content">
+    <header class="top-header">
+        <div>
+            <h1>Submit Document</h1>
+            <p>@DateTime.Now.ToString("dddd, MMMM dd, yyyy")</p>
+        </div>
+        <partial name="_UserNotification" />
+    </header>
+
+    <div class="row g-4">
+        <div class="col-md-8">
+            <div class="card p-4 shadow-sm">
+                <form asp-controller="User" asp-action="SubmitDocument" method="post">
+                    <div class="mb-3">
+                        <label class="form-label">Document Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="DocumentName" placeholder="e.g. Budget Proposal FY2025" required />
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">From Department <span class="text-danger">*</span></label>
+                            <select class="form-select" name="FromDepartmentId" required>
+                                <option value="">Select department</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">To Department <span class="text-danger">*</span></label>
+                            <select class="form-select" name="ToDepartmentId" required>
+                                <option value="">Select department</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Reason for Submission</label>
+                            <select class="form-select" name="Reason">
+                                <option value="For Approval">For Approval</option>
+                                <option value="For Signature">For Signature</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Assigned To <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="AssignedTo" placeholder="e.g. Dir. Roberto Santos" required />
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" name="Description" rows="4" placeholder="Brief description of the document and its purpose..."></textarea>
+                    </div>
+
+                    <div class="alert alert-info py-2">
+                        <i class="bi bi-info-circle"></i> A unique Tracking Code will be generated upon submission. Please keep this code for reference.
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 py-2">Submit Document</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card p-3 shadow-sm mb-3">
+                <h6>Tracking Code Info</h6>
+                <p class="small text-muted mb-0">After submitting a document, the system will automatically generate a unique Tracking Code (example: DT-2026-000001).</p>
+            </div>
+            <div class="card p-3 shadow-sm">
+                <h6>Quick Tips</h6>
+                <ul class="small text-muted ps-3 mb-0">
+                    <li>Use a clear and specific Document Name.</li>
+                    <li>Always select the correct From and To Department.</li>
+                    <li>Save the Tracking Code after submission.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</main>

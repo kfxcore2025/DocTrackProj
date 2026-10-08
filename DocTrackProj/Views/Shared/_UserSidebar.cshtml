@@ -1,0 +1,54 @@
+﻿@{
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+}
+
+<aside class="sidebar">
+    <div class="brand">
+        <div class="brand-icon">📄</div>
+        <div>
+            <h2>DocTraCode</h2>
+            <span>TRACKING CODE SYSTEM</span>
+        </div>
+    </div>
+
+    <div class="role-badge">👤 USER</div>
+
+    <nav class="sidebar-nav">
+        <a href="/User/Dashboard" class="nav-item @(currentAction == "Dashboard" ? "active" : "")">
+            <span class="nav-icon">▦</span>
+            <span>Dashboard</span>
+        </a>
+
+        <a href="/User/Submit" class="nav-item @(currentAction == "Submit" ? "active" : "")">
+            <span class="nav-icon">📤</span>
+            <span>Submit Document</span>
+        </a>
+
+        <a href="/User/Receive" class="nav-item @(currentAction == "Receive" ? "active" : "")">
+            <span class="nav-icon">📥</span>
+            <span>Receive</span>
+        </a>
+
+        <a href="/User/MyDocuments" class="nav-item @(currentAction == "MyDocuments" ? "active" : "")">
+            <span class="nav-icon">▤</span>
+            <span>My Documents</span>
+        </a>
+
+        <a href="/User/Settings" class="nav-item @(currentAction == "Settings" ? "active" : "")">
+            <span class="nav-icon">⚙</span>
+            <span>Settings</span>
+        </a>
+    </nav>
+
+    <div class="sidebar-bottom">
+        <div class="admin-profile">
+            <div class="profile-circle">US</div>
+            <div>
+                <strong>User</strong>
+                <small>user@ctu.db</small>
+            </div>
+        </div>
+        <a href="/Account/Login" class="logout">↪ Logout</a>
+    </div>
+</aside>

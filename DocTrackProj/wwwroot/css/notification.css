@@ -1,0 +1,224 @@
+﻿/* =========================
+   NOTIFICATION WRAPPER (Right side)
+========================= */
+.notification-wrapper {
+    position: relative;
+    margin-left: auto;
+}
+
+/* =========================
+   BELL BUTTON
+========================= */
+.notification {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 1px solid #d9cbbb;
+    background: #ffffff;
+    font-size: 20px;
+    position: relative;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s ease;
+}
+
+    .notification:hover {
+        background: #f8f0e5;
+    }
+
+/* =========================
+   COUNT BADGE
+========================= */
+.notification-count {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 50%;
+    background: #b53b2f;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #ffffff;
+}
+
+/* =========================
+   POPUP
+========================= */
+.notification-popup {
+    position: absolute;
+    top: 58px;
+    right: 0;
+    left: auto;
+    width: 360px;
+    max-height: 480px;
+    background: #fffaf3;
+    border: 1px solid #e4d7c7;
+    border-radius: 12px;
+    box-shadow: 0 12px 40px rgba(68, 42, 22, 0.18);
+    z-index: 1000;
+    display: none;
+    overflow: hidden;
+}
+
+    .notification-popup.show {
+        display: block;
+    }
+
+/* =========================
+   POPUP HEADER
+========================= */
+.notification-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 18px;
+    border-bottom: 1px solid #e4d7c7;
+    background: #f8f0e5;
+}
+
+    .notification-header h3 {
+        margin: 0;
+        font-size: 17px;
+        color: #34251b;
+    }
+
+    .notification-header span {
+        background: #b53b2f;
+        color: white;
+        border-radius: 20px;
+        padding: 3px 10px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+/* =========================
+   LIST
+========================= */
+.notification-list {
+    max-height: 380px;
+    overflow-y: auto;
+}
+
+/* =========================
+   CLICKABLE ITEM
+========================= */
+a.notification-item {
+    display: flex;
+    gap: 12px;
+    padding: 14px 16px;
+    border-bottom: 1px solid #eadfd3;
+    text-decoration: none;
+    color: inherit;
+    transition: background 0.2s;
+}
+
+    a.notification-item:hover {
+        background: #f8f0e5;
+    }
+
+/* =========================
+   ICON
+========================= */
+.notification-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #f0e3c1;
+    color: #8d5a22;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 18px;
+}
+
+/* =========================
+   TEXT
+========================= */
+.notification-text {
+    flex: 1;
+}
+
+    .notification-text strong {
+        display: block;
+        font-size: 14px;
+        color: #34251b;
+    }
+
+    .notification-text p {
+        margin: 3px 0;
+        font-size: 13px;
+        color: #806f60;
+    }
+
+    .notification-text small {
+        font-size: 11px;
+        color: #a99583;
+    }
+
+/* =========================
+   EMPTY STATE
+========================= */
+.no-notifications {
+    padding: 40px 20px;
+    text-align: center;
+    color: #806f60;
+}
+
+    .no-notifications p {
+        margin: 8px 0 0;
+    }
+
+/* =========================
+   DARK MODE
+========================= */
+body.dark-mode .notification {
+    background: #2a1d16;
+    border-color: #594335;
+}
+
+    body.dark-mode .notification:hover {
+        background: #3d2e1f;
+    }
+
+body.dark-mode .notification-popup {
+    background: #2a1d16;
+    border-color: #4b382b;
+}
+
+body.dark-mode .notification-header {
+    background: #211711;
+    border-color: #4b382b;
+}
+
+    body.dark-mode .notification-header h3 {
+        color: #f5eadc;
+    }
+
+body.dark-mode a.notification-item {
+    border-color: #4b382b;
+}
+
+    body.dark-mode a.notification-item:hover {
+        background: #211711;
+    }
+
+body.dark-mode .notification-text strong {
+    color: #f5eadc;
+}
+
+body.dark-mode .notification-text p {
+    color: #bca995;
+}
+
+body.dark-mode .no-notifications {
+    color: #bca995;
+}

@@ -1,0 +1,169 @@
+﻿@model List<DocTrackProj.Models.AdminDocument>
+
+@{
+    ViewData["Title"] = "Audit Logs";
+
+    // The controller now sends AdminDocument records.
+    var documents = Model ?? new List<DocTrackProj.Models.AdminDocument>();
+
+    var notifications =
+        ViewBag.Notifications as List<DocTrackProj.Models.AdminDocument>
+?? new List<DocTrackProj.Models.AdminDocument>();
+
+    var pendingCount = ViewBag.PendingDocuments is int pending
+? pending
+: 0;
+
+    var forSignatureCount = ViewBag.ForSignatureDocuments is int forSignature
+? forSignature
+: 0;
+}
+
+<link rel="stylesheet"
+      href="~/css/audit.css"
+      asp-append-version="true" />
+
+<div class="admin-layout">
+
+    <!-- SIDEBAR -->
+    <partial name="_AdminSidebar" />
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <header class="top-header">
+            <div>
+                <h1>Audit Logs</h1>
+                <p>@DateTime.Now.ToString("dddd, MMMM dd, yyyy")</p>
+            </div>
+
+            <partial name="_Notification" />
+        </header>
+
+        <div class="audit-content">
+
+            <div class="audit-header">
+                <h2>Audit Logs</h2>
+                <div class="viewing-badge">System Activity</div>
+            </div>
+
+            <!-- SEARCH -->
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+
+                <input type="text"
+                       id="searchInput"
+                       placeholder="Search by user, action, tracking code..."
+                       onkeyup="filterTable()" />
+            </div>
+
+            <!-- TABLE -->
+            <div class="documents-card">
+                <div class="table-container">
+                    <table id="auditTable">
+                        <thead>
+                            <tr>
+                                <th>DATE &amp; TIME</th>
+                                <th>USER</th>
+                                <th>ACTION</th>
+                                <th>DOCUMENT</th>
+                                <th>TRACKING CODE</th>
+                                <th>DETAILS</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @if (documents.Any())
+                            {
+                                foreach (var doc in documents)
+                                {
+                                    <tr>
+                                        <td>
+                                            @doc.DateSubmitted.ToString(
+                                            "MMM dd, yyyy hh:mm tt")
+                                </td>
+
+                                <td>
+                                    <div class="user-cell">
+                                        <div class="user-avatar">AD</div>
+                                        <span>Administrator</span>
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <span class="action-badge">
+                                        Submitted
+                                    </span>
+                                </td>
+
+                                <td>
+                                    @(doc.DocumentName ?? "—")
+                                </td>
+
+                                <td class="tracking-code">
+                                    @(doc.TrackingCode ?? "—")
+                                </td>
+
+                                <td>
+                                    From
+                                    @(doc.FromOffice?.OfficeName ?? "—")
+                                    to
+                                    @(doc.ToOffice?.OfficeName ?? "—")
+                                </td>
+                            </tr>
+                                                        }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="6" class="no-documents">
+                                        <div class="empty-state">
+                                            <div class="empty-icon">📋</div>
+                                            <strong>No audit records found</strong>
+                                            <span>
+                                                There are currently no activities
+                                                recorded.
+                                            </span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="table-footer">
+                    Showing @documents.Count of @documents.Count records
+                </div>
+            </div>
+
+        </div>
+    </main>
+</div>
+
+<script>
+    function filterTable() {
+        const input = document.getElementById("searchInput");
+        const filter = input.value.toUpperCase();
+        const table = document.getElementById("auditTable");
+        const rows = table.getElementsByTagName("tr");
+
+        // Start at 1 so the table header is not filtered.
+        for (let i = 1; i < rows.length; i++) {
+            const cells = rows[i].getElementsByTagName("td");
+            let found = false;
+
+            for (let j = 0; j < cells.length; j++) {
+                const text =
+                    cells[j].textContent || cells[j].innerText || "";
+
+                if (text.toUpperCase().indexOf(filter) > -1) {
+                    found = true;
+                    break;
+                }
+            }
+
+            rows[i].style.display = found? "": "none";
+        }
+    }
+</script>

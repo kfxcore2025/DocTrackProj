@@ -1,0 +1,156 @@
+﻿@{
+    ViewData["Title"] = "Settings";
+    var notifications = ViewBag.Notifications as List<DocTrackProj.Models.Document>;
+    var pendingCount = ViewBag.PendingDocuments ?? 0;
+    var forSignatureCount = ViewBag.ForSignatureDocuments ?? 0;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DocTrack - Settings</title>
+    <link rel="stylesheet" href="~/css/settings.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="admin-layout">
+        <partial name="_AdminSidebar" />
+        <main class="main-content">
+            <header class="top-header">
+                <div>
+                    <h1>Settings</h1>
+                    <p>@DateTime.Now.ToString("dddd, MMMM dd, yyyy")</p>
+                </div>
+                <partial name="_Notification" />
+            </header>
+
+            <div class="settings-content">
+                <h2 class="page-title">Settings</h2>
+
+                <!-- Success / Error Messages -->
+                @if (TempData["Success"] != null)
+                {
+                    <div style="background:#d4edda;color:#155724;padding:12px 16px;border-radius:8px;margin-bottom:20px;">
+                        @TempData["Success"]
+                    </div>
+                }
+                @if (TempData["Error"] != null)
+                {
+                    <div style="background:#f8d7da;color:#721c24;padding:12px 16px;border-radius:8px;margin-bottom:20px;">
+                        @TempData["Error"]
+                    </div>
+                }
+
+                <!-- SECURITY -->
+                <section class="settings-card">
+                    <div class="settings-card-header">
+                        <span class="section-icon">♙</span>
+                        <h2>Security</h2>
+                    </div>
+
+                    <!-- Change Password Form -->
+                    <form method="post" asp-action="ChangePassword" asp-controller="Admin">
+                        @Html.AntiForgeryToken()
+
+                        <div class="form-group">
+                            <label>Current Password</label>
+                            <input type="password" name="CurrentPassword" placeholder="••••••••" required />
+                        </div>
+                        <div class="form-group">
+                            <label>New Password</label>
+                            <input type="password" name="NewPassword" placeholder="••••••••" required />
+                        </div>
+                        <div class="form-group">
+                            <label>Confirm New Password</label>
+                            <input type="password" name="ConfirmPassword" placeholder="••••••••" required />
+                        </div>
+
+                        <button type="submit" class="save-button" style="margin-top:10px; margin-bottom:20px;">
+                            Change Password
+                        </button>
+                    </form>
+
+                    <div class="setting-row">
+                        <div>
+                            <h3>Two-Factor Authentication</h3>
+                            <p>Add an extra layer of security to your account.</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="twoFactorToggle" />
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </section>
+
+                <!-- APPEARANCE -->
+                <section class="settings-card">
+                    <div class="settings-card-header">
+                        <span class="section-icon">◐</span>
+                        <h2>Appearance</h2>
+                    </div>
+                    <div class="setting-row">
+                        <div>
+                            <h3>Dark Mode</h3>
+                            <p>Change the appearance of the system.</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="darkModeToggle" />
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </section>
+
+                <!-- SAVE BUTTON for toggles -->
+                <button class="save-button" id="saveChangesButton">
+                    Save Changes
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Dark Mode
+        const darkModeToggle = document.getElementById("darkModeToggle");
+        const saveChangesButton = document.getElementById("saveChangesButton");
+        const twoFactorToggle = document.getElementById("twoFactorToggle");
+
+        if (localStorage.getItem("darkMode") === "enabled") {
+            document.body.classList.add("dark-mode");
+            if (darkModeToggle) darkModeToggle.checked = true;
+        }
+
+        if (darkModeToggle) {
+            darkModeToggle.addEventListener("change", function () {
+                if (this.checked) {
+                    document.body.classList.add("dark-mode");
+                    localStorage.setItem("darkMode", "enabled");
+                } else {
+                    document.body.classList.remove("dark-mode");
+                    localStorage.setItem("darkMode", "disabled");
+                }
+            });
+        }
+
+        // Two-Factor
+        if (twoFactorToggle) {
+            twoFactorToggle.checked = localStorage.getItem("twoFactor") === "enabled";
+            twoFactorToggle.addEventListener("change", function () {
+                localStorage.setItem("twoFactor", this.checked ? "enabled" : "disabled");
+            });
+        }
+
+        // Save Changes button`                                                                                                                                                                                                                                                                                                                                                                 
+        if (saveChangesButton) {
+            saveChangesButton.addEventListener("click", function () {
+                if (darkModeToggle) {
+                    localStorage.setItem("darkMode", darkModeToggle.checked ? "enabled" : "disabled");
+                }
+                if (twoFactorToggle) {
+                    localStorage.setItem("twoFactor", twoFactorToggle.checked ? "enabled" : "disabled");
+                }
+                alert("Settings saved successfully!");
+            });
+        }
+    </script>
+</body>
+</html>

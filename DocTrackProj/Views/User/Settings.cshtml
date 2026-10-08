@@ -1,0 +1,287 @@
+﻿@using DocTrackProj.Models
+
+@{
+    ViewData["Title"] = "Settings";
+
+    var notifications =
+        ViewBag.Notifications as List<AdminDocument>
+?? new List<AdminDocument>();
+
+    var pendingCount = ViewBag.PendingDocuments is int pending
+? pending
+: 0;
+
+    var forSignatureCount =
+        ViewBag.ForSignatureDocuments is int forSignature
+? forSignature
+: 0;
+
+    var notificationCount =
+        ViewBag.NotificationCount is int count
+? count
+: 0;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>DocTrack - User Settings</title>
+
+    <link rel="stylesheet"
+          href="~/css/settings.css"
+          asp-append-version="true" />
+</head>
+
+<body>
+
+    <div class="admin-layout">
+
+        <!-- USER SIDEBAR -->
+        <partial name="_UserSidebar" />
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+
+            <header class="top-header">
+                <div>
+                    <h1>Settings</h1>
+                    <p>
+                        @DateTime.Now.ToString("dddd, MMMM dd, yyyy")
+                    </p>
+                </div>
+
+                <partial name="_Notification" />
+            </header>
+
+            <div class="settings-content">
+
+                <h2 class="page-title">Settings</h2>
+
+                <!-- SUCCESS MESSAGE -->
+                @if (TempData["Success"] != null)
+                {
+                    <div class="success-message">
+                        @TempData["Success"]
+                    </div>
+                }
+
+                <!-- ERROR MESSAGE -->
+                @if (TempData["Error"] != null)
+                {
+                    <div class="error-message">
+                        @TempData["Error"]
+                    </div>
+                }
+
+                <!-- SECURITY -->
+                <section class="settings-card">
+
+                    <div class="settings-card-header">
+                        <span class="section-icon">♙</span>
+                        <h2>Security</h2>
+                    </div>
+
+                    <!-- USER CHANGE PASSWORD FORM -->
+                    <form method="post"
+                          asp-controller="User"
+                          asp-action="ChangePassword">
+
+                        @Html.AntiForgeryToken()
+
+                        <div class="form-group">
+                            <label for="CurrentPassword">
+                                Current Password
+                            </label>
+
+                            <input type="password"
+                                   id="CurrentPassword"
+                                   name="CurrentPassword"
+                                   placeholder="••••••••"
+                                   required />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="NewPassword">
+                                New Password
+                            </label>
+
+                            <input type="password"
+                                   id="NewPassword"
+                                   name="NewPassword"
+                                   placeholder="••••••••"
+                                   required />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="ConfirmPassword">
+                                Confirm New Password
+                            </label>
+
+                            <input type="password"
+                                   id="ConfirmPassword"
+                                   name="ConfirmPassword"
+                                   placeholder="••••••••"
+                                   required />
+                        </div>
+
+                        <button type="submit"
+                                class="save-button password-button">
+                            Change Password
+                        </button>
+                    </form>
+
+                    <!-- TWO-FACTOR AUTHENTICATION -->
+                    <div class="setting-row">
+
+                        <div>
+                            <h3>Two-Factor Authentication</h3>
+                            <p>
+                                Add an extra layer of security to your account.
+                            </p>
+                        </div>
+
+                        <label class="switch">
+                            <input type="checkbox"
+                                   id="twoFactorToggle" />
+
+                            <span class="slider"></span>
+                        </label>
+
+                    </div>
+
+                </section>
+
+                <!-- APPEARANCE -->
+                <section class="settings-card">
+
+                    <div class="settings-card-header">
+                        <span class="section-icon">◐</span>
+                        <h2>Appearance</h2>
+                    </div>
+
+                    <div class="setting-row">
+
+                        <div>
+                            <h3>Dark Mode</h3>
+                            <p>
+                                Change the appearance of the system.
+                            </p>
+                        </div>
+
+                        <label class="switch">
+                            <input type="checkbox"
+                                   id="darkModeToggle" />
+
+                            <span class="slider"></span>
+                        </label>
+
+                    </div>
+
+                </section>
+
+                <!-- SAVE BUTTON FOR LOCAL SETTINGS -->
+                <button type="button"
+                        class="save-button"
+                        id="saveChangesButton">
+                    Save Changes
+                </button>
+
+            </div>
+
+        </main>
+
+    </div>
+
+    <script>
+
+                const darkModeToggle =
+                    document.getElementById("darkModeToggle");
+
+                const twoFactorToggle =
+                    document.getElementById("twoFactorToggle");
+
+                const saveChangesButton =
+                    document.getElementById("saveChangesButton");
+
+                // =========================
+                // LOAD DARK MODE SETTING
+                // =========================
+                if (localStorage.getItem("darkMode") === "enabled") {
+                    document.body.classList.add("dark-mode");
+
+                    if (darkModeToggle) {
+                        darkModeToggle.checked = true;
+                    }
+                }
+
+                // =========================
+                // DARK MODE TOGGLE
+                // =========================
+                if (darkModeToggle) {
+                    darkModeToggle.addEventListener("change", function () {
+
+                        if (this.checked) {
+                            document.body.classList.add("dark-mode");
+                            localStorage.setItem("darkMode", "enabled");
+                        }
+                        else {
+                            document.body.classList.remove("dark-mode");
+                            localStorage.setItem("darkMode", "disabled");
+                        }
+
+                    });
+                }
+
+                // =========================
+                // LOAD TWO-FACTOR SETTING
+                // =========================
+                if (twoFactorToggle) {
+                    twoFactorToggle.checked =
+                    localStorage.getItem("twoFactor") === "enabled";
+                }
+
+                // =========================
+                // TWO-FACTOR TOGGLE
+                // =========================
+                if (twoFactorToggle) {
+                    twoFactorToggle.addEventListener("change", function () {
+
+                        localStorage.setItem(
+                            "twoFactor",
+                            this.checked? "enabled": "disabled"
+                        );
+
+                    });
+                }
+
+                // =========================
+                // SAVE LOCAL SETTINGS
+                // =========================
+                if (saveChangesButton) {
+                    saveChangesButton.addEventListener("click", function () {
+
+                        if (darkModeToggle) {
+                            localStorage.setItem(
+                                "darkMode",
+                                darkModeToggle.checked? "enabled" : "disabled"
+                            );
+                        }
+
+                        if (twoFactorToggle) {
+                            localStorage.setItem(
+                                "twoFactor",
+                                twoFactorToggle.checked? "enabled" : "disabled"
+                            );
+                        }
+
+                        alert("Settings saved successfully!");
+                    });
+                }
+
+    </script>
+
+</body>
+</html>

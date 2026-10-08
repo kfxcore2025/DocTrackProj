@@ -1,0 +1,83 @@
+﻿@{
+    ViewData["Title"] = "Document Details";
+    var doc = Model as DocTrackProj.Models.AdminDocument;
+}
+<link rel="stylesheet" href="~/css/documentdetails.css" asp-append-version="true" />
+<div class="admin-layout">
+    <partial name="_AdminSidebar" />
+    <main class="main-content">
+        <header class="top-header">
+            <div>
+                <h1>Document Details</h1>
+                <p>@DateTime.Now.ToString("dddd, MMMM dd, yyyy")</p>
+            </div>
+            <partial name="_Notification" />
+        </header>
+        <div class="details-content">
+            <a href="/Admin/HistoryLogs" class="back-link">← Back to History Logs</a>
+            @if (doc != null)
+            {
+                <div class="details-card">
+                    <div class="details-header">
+                        <div>
+                            <h2>@doc.DocumentName</h2>
+                            <span class="tracking-code">@doc.TrackingCode</span>
+                        </div>
+                        <div>
+                            @if (doc.Status == "Pending")
+                            {
+                                <span class="status pending">● Pending</span>
+                            }
+                            else if (doc.Status == "Received")
+                            {
+                                <span class="status received">● Received</span>
+                            }
+                            else
+                            {
+                                <span class="status">● @doc.Status</span>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="details-grid">
+                        <div class="detail-item">
+                            <label>From Department</label>
+                            <p>@(doc.FromOffice?.OfficeName ?? "—")</p>
+                        </div>
+                        <div class="detail-item">
+                            <label>To Department</label>
+                            <p>@(doc.ToOffice?.OfficeName ?? "—")</p>
+                        </div>
+                        <div class="detail-item">
+                            <label>Reason</label>
+                            <p>@(string.IsNullOrEmpty(doc.Reason) ? "—" : doc.Reason)</p>
+                        </div>
+                        <div class="detail-item">
+                            <label>Status</label>
+                            <p>@doc.Status</p>
+                        </div>
+                        <div class="detail-item">
+                            <label>Date Submitted</label>
+                            <p>@doc.DateSubmitted.ToString("MMMM dd, yyyy hh:mm tt")</p>
+                        </div>
+                        <div class="detail-item">
+                            <label>Last Updated</label>
+                            <p>@doc.DateUpdated.ToString("MMMM dd, yyyy hh:mm tt")</p>
+                        </div>
+
+                        <!-- Description (full width) -->
+                        <div class="detail-item" style="grid-column: 1 / -1;">
+                            <label>Description</label>
+                            <p>@(string.IsNullOrWhiteSpace(doc.Description) ? "—" : doc.Description)</p>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </main>
+</div>
+<script>
+    if (localStorage.getItem("darkMode") === "enabled") {
+        document.body.classList.add("dark-mode");
+    }
+</script>

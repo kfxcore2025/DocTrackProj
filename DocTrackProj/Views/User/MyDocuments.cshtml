@@ -1,0 +1,152 @@
+﻿@model List<DocTrackProj.Models.UserDocument>
+@{
+    ViewData["Title"] = "My Documents";
+}
+<link rel="stylesheet"
+      href="~/css/user-documents.css"
+      asp-append-version="true" />
+<div class="admin-layout user-documents-layout">
+    <!-- USER SIDEBAR -->
+    <partial name="_UserSidebar" />
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <header class="top-header">
+            <div>
+                <h1>My Documents</h1>
+                <p>@DateTime.Now.ToString("dddd, MMMM dd, yyyy")</p>
+            </div>
+            <partial name="_UserNotification" />
+        </header>
+        <div class="history-content">
+            <div class="history-header">
+                <h2>My Documents</h2>
+                <div class="viewing-badge">
+                    Viewing: My Documents
+                </div>
+            </div>
+            <!-- SEARCH -->
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text"
+                       id="searchInput"
+                       placeholder="Search by tracking code, name, status..."
+                       onkeyup="filterTable()" />
+            </div>
+            <!-- TABLE -->
+            <div class="documents-card">
+                <div class="table-container">
+                    <table id="documentsTable">
+                        <thead>
+                            <tr>
+                                <th>TRACKING CODE</th>
+                                <th>DOCUMENT NAME</th>
+                                <th>FROM</th>
+                                <th>TO</th>
+                                <th>REASON</th>
+                                <th>STATUS</th>
+                                <th>DATE &amp; TIME</th>
+                                <th>ACTION</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model != null && Model.Any())
+                            {
+                                foreach (var doc in Model)
+                                {
+                                    <tr>
+                                        <td class="tracking-code">
+                                            @doc.TrackingCode
+                                        </td>
+                                        <td>
+                                            @doc.DocumentName
+                                        </td>
+                                        <td>
+                                            @(doc.FromOffice?.OfficeName ?? "—")
+                                        </td>
+                                        <td>
+                                            @(doc.ToOffice?.OfficeName ?? "—")
+                                        </td>
+                                        <td>
+                                            @(string.IsNullOrWhiteSpace(doc.Reason) ? "—" : doc.Reason)
+                                        </td>
+                                        <td>
+                                            @if (doc.Status == "Pending")
+                                            {
+                                                <span class="status pending">● Pending</span>
+                                            }
+                                            else if (doc.Status == "Received")
+                                            {
+                                                <span class="status received">● Received</span>
+                                            }
+                                            else if (doc.Status == "For Signature")
+                                            {
+                                                <span class="status for-signature">● For Signature</span>
+                                            }
+                                            else if (doc.Status == "Completed")
+                                            {
+                                                <span class="status completed">● Completed</span>
+                                            }
+                                            else if (doc.Status == "Rejected")
+                                            {
+                                                <span class="status rejected">● Rejected</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="status">● @doc.Status</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @doc.DateSubmitted.ToString("MMM dd, yyyy hh:mm tt")
+                                        </td>
+                                        <td>
+                                            <a href="/User/DocumentDetails/@doc.Id" class="view-btn">View</a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="8" class="no-documents">
+                                        <div class="empty-state">
+                                            <div class="empty-icon">📭</div>
+                                            <strong>No documents found</strong>
+                                            <span>
+                                                Documents you submit or receive will appear here.
+                                            </span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <div class="table-footer">
+                    Showing @(Model?.Count ?? 0) of @(Model?.Count ?? 0) records
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+<script>
+    function filterTable() {
+        const input = document.getElementById("searchInput");
+        const filter = input.value.toUpperCase();
+        const table = document.getElementById("documentsTable");
+        const rows = table.getElementsByTagName("tr");
+        for (let i = 1; i < rows.length; i++) {
+            let found = false;
+            const cells = rows[i].getElementsByTagName("td");
+            for (let j = 0; j < cells.length; j++) {
+                if (cells[j]) {
+                    const text = cells[j].textContent || cells[j].innerText;
+                    if (text.toUpperCase().indexOf(filter) > -1) {
+                        found = true;
+                        break;
+                    }
+                }
+            }
+            rows[i].style.display = found ? "" : "none";
+        }
+    }
+</script>

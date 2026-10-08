@@ -1,0 +1,49 @@
+﻿@{
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+}
+<aside class="sidebar">
+    <div class="brand">
+        <div class="brand-logo-wrap">
+            <img src="~/images/ctu-logo.png" alt="CTU Logo" />
+            <div class="brand-text"><h1>CTU</h1><h2>DOCUMENT TRACKING</h2><h3>SYSTEM</h3></div>
+        </div>
+        <div class="brand-sub">Cebu Technological University – Daanbantayan Campus</div>
+    </div>
+
+    <div class="role-badge">👤 ADMINISTRATOR - 2026</div>
+
+    <nav class="sidebar-nav">
+        <a href="/Admin/Dashboard" class="nav-item @(currentAction == "Dashboard" ? "active" : "")">
+            <span class="nav-icon">▦</span><span>Dashboard</span>
+        </a>
+        <a href="/Admin/Receive" class="nav-item @(currentAction == "Receive" ? "active" : "")">
+            <span class="nav-icon">📥</span><span>Receive</span>
+        </a>
+        <a href="/Admin/SubDoc" class="nav-item @(currentAction == "SubDoc" ? "active" : "")">
+            <span class="nav-icon">📤</span><span>Submitting Documents</span>
+        </a>
+        <a href="/Admin/HistoryLogs" class="nav-item @(currentAction == "HistoryLogs" ? "active" : "")">
+            <span class="nav-icon">▤</span><span>History Logs</span>
+        </a>
+        <a href="/Admin/Audit" class="nav-item @(currentAction == "Audit" ? "active" : "")">
+            <span class="nav-icon">🔍</span><span>Audit Logs</span>
+        </a>
+        <a href="/Admin/Manage" class="nav-item @(currentAction == "Manage" ? "active" : "")">
+            <span class="nav-icon">👥</span><span>Manage</span>
+        </a>
+        <a href="/Admin/Settings" class="nav-item @(currentAction == "Settings" ? "active" : "")">
+            <span class="nav-icon">⚙</span><span>Settings</span>
+        </a>
+    </nav>
+
+    <div class="sidebar-bottom">
+        <div class="admin-profile">
+            <div class="profile-circle">AD</div>
+            <div>
+                <strong>Administrator</strong>
+                <small>admin@ctu.edu.ph</small>
+            </div>
+        </div>
+        <a href="/Account/Logout" class="logout">↪ Logout</a>
+    </div>
+</aside>

@@ -1,0 +1,341 @@
+﻿@{
+    ViewData["Title"] = "Admin Dashboard";
+    var recentDocuments = ViewBag.RecentDocuments as List<DocTrackProj.Models.AdminDocument>;
+    var notifications = ViewBag.Notifications as List<DocTrackProj.Models.AdminDocument>;
+    var notifCount = ViewBag.NotificationCount ?? 0;
+}
+<link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+
+<style>
+    .dashboard-body {
+        padding: 28px;
+    }
+
+    .welcome-banner {
+        background: linear-gradient(135deg, #2b1a0f 0%, #8d5a22 55%, #c7962c 100%);
+        border-radius: 18px;
+        padding: 26px 28px;
+        color: #fff;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        margin-bottom: 20px;
+    }
+
+        .welcome-banner p {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            opacity: 0.8;
+        }
+
+        .welcome-banner h2 {
+            font-size: 26px;
+            margin: 4px 0;
+        }
+
+        .welcome-banner span {
+            font-size: 13px;
+            opacity: 0.85;
+        }
+
+    /* Stats */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4,1fr);
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+
+    .stat-card {
+        background: #fffaf3;
+        border: 1px solid #e8ddd0;
+        border-radius: 14px;
+        padding: 18px;
+        transition: 0.2s;
+    }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.07);
+        }
+
+    .stat-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .stat-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+    }
+
+        .stat-icon.blue {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .stat-icon.yellow {
+            background: #fde68a;
+            color: #b45309;
+        }
+
+        .stat-icon.green {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .stat-icon.purple {
+            background: #ede9fe;
+            color: #5b21b6;
+        }
+
+    .stat-card h2 {
+        font-size: 24px;
+        color: #2d1d14;
+    }
+
+    .stat-card p {
+        font-size: 11px;
+        color: #8a7563;
+        text-transform: uppercase;
+        margin-top: 2px;
+    }
+
+    /* Table */
+    .documents-card {
+        background: #fffaf3;
+        border: 1px solid #e8ddd0;
+        border-radius: 14px;
+        overflow: hidden;
+    }
+
+    .documents-header {
+        padding: 16px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #e8ddd0;
+    }
+
+        .documents-header h2 {
+            font-size: 15px;
+        }
+
+    .status {
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+        .status.pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status.signature {
+            background: #ede9fe;
+            color: #5b21b6;
+        }
+
+        .status.approved {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+    /* Header with bell */
+    .top-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .header-right {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    /* Notification bell - matches your admin.css */
+    .notification-bell {
+        position: relative;
+        cursor: pointer;
+        font-size: 22px;
+        background: #fffaf3;
+        border: 1px solid #e8ddd0;
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .notif-badge {
+        position: absolute;
+        top: -6px;
+        right: -6px;
+        background: #b53b2f;
+        color: #fff;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        font-size: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+    }
+
+    .admin-footer {
+        text-align: center;
+        padding: 18px;
+        font-size: 11px;
+        color: #a99583;
+    }
+
+    /* Dark mode */
+    body.dark-mode .stat-card {
+        background: #2a1d16;
+        border-color: #3d2e22;
+    }
+
+        body.dark-mode .stat-card h2 {
+            color: #f5eadc;
+        }
+
+    body.dark-mode .documents-card {
+        background: #2a1d16;
+        border-color: #3d2e22;
+    }
+
+    body.dark-mode .notification-bell {
+        background: #2a1d16;
+        border-color: #3d2e22;
+    }
+</style>
+
+<div class="admin-layout">
+    <partial name="_AdminSidebar" />
+
+    <main class="main-content">
+        <header class="top-header">
+            <div>
+                <h1>Dashboard</h1>
+                <p>Admin Panel • 2026</p>
+            </div>
+
+            <div class="header-right">
+                <!-- NOTIFICATION BELL - KEPT -->
+                <div class="notification-bell" onclick="toggleNotif()">
+                    🔔
+                    @if (notifCount > 0)
+                    {
+                        <span class="notif-badge">@notifCount</span>
+                    }
+                </div>
+                <partial name="_Notification" />
+            </div>
+        </header>
+
+        <div class="dashboard-body">
+            <section class="welcome-banner">
+                <p>Welcome back</p>
+                <h2>Administrator</h2>
+                <span>You have @notifCount new notifications. Review pending documents below.</span>
+            </section>
+
+            <section class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-top"><div class="stat-icon blue">▤</div><span style="font-size:10px;">TOTAL</span></div>
+                    <h2>@ViewBag.TotalDocuments</h2><p>Total Documents</p>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-top"><div class="stat-icon yellow">◷</div><span style="font-size:10px;">PENDING</span></div>
+                    <h2>@ViewBag.PendingDocuments</h2><p>Pending</p>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-top"><div class="stat-icon green">✓</div><span style="font-size:10px;">DONE</span></div>
+                    <h2>@ViewBag.ApprovedDocuments</h2><p>Approved</p>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-top"><div class="stat-icon purple">✎</div><span style="font-size:10px;">SIGN</span></div>
+                    <h2>@ViewBag.ForSignatureDocuments</h2><p>For Signature</p>
+                </div>
+            </section>
+
+            <section class="documents-card">
+                <div class="documents-header">
+                    <h2>Recent Documents</h2>
+                    <a asp-controller="Admin" asp-action="HistoryLogs">View All →</a>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>TRACKING CODE</th>
+                                <th>DOCUMENT</th>
+                                <th>FROM</th>
+                                <th>TO</th>
+                                <th>STATUS</th>
+                                <th>DATE</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (recentDocuments != null && recentDocuments.Any())
+                            {
+                                foreach (var doc in recentDocuments)
+                                {
+                                    <tr>
+                                        <td class="tracking-code">@doc.TrackingCode</td>
+                                        <td>@doc.DocumentName</td>
+                                        <td>@doc.FromOffice?.OfficeName</td>
+                                        <td>@doc.ToOffice?.OfficeName</td>
+                                        <td>
+                                            @if (doc.Status == "Pending")
+                                            {
+                                                <span class="status pending">Pending</span>
+                                            }
+                                            else if (doc.Status == "For Signature")
+                                            {
+
+                                                <span class="status signature">For Signature</span>
+                                            }
+                                            else
+                                            {
+
+                                                <span class="status approved">@doc.Status</span>
+                                            }
+                                        </td>
+                                        <td>@doc.DateSubmitted.ToString("MMM dd, yyyy")</td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr><td colspan="6" class="no-documents">No documents found.</td></tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <footer class="admin-footer">© 2026 CTU Document Tracking System. All rights reserved.</footer>
+        </div>
+    </main>
+</div>
+
+<script>
+    function toggleNotif(){
+        const popup = document.getElementById('notificationPopup');
+        if(popup) popup.classList.toggle('show');
+    }
+    // dark mode keep
+    if(localStorage.getItem("darkMode")==="enabled"){ document.body.classList.add("dark-mode"); }
+</script>

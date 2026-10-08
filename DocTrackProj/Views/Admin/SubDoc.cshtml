@@ -1,0 +1,214 @@
+﻿@{
+    ViewData["Title"] = "Submit Document";
+    var notifications = ViewBag.Notifications as List<DocTrackProj.Models.Document>;
+    var pendingCount = ViewBag.PendingDocuments ?? 0;
+    var forSignatureCount = ViewBag.ForSignatureDocuments ?? 0;
+}
+
+<link rel="stylesheet" href="~/css/subdoc.css" asp-append-version="true" />
+
+<div class="admin-layout">
+
+    <!-- SIDEBAR -->
+    <partial name="_AdminSidebar" />
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <header class="top-header">
+            <div>
+                <h1>Submitting Document</h1>
+                <p>@DateTime.Now.ToString("dddd, MMMM dd, yyyy")</p>
+            </div>
+
+            <partial name="_Notification" />
+        </header>
+
+        <div class="submit-content">
+
+            @if (TempData["Success"] != null)
+            {
+                <div class="success-card">
+                    <div class="success-icon">✓</div>
+                    <div class="success-content">
+                        <h3>Document Submitted Successfully!</h3>
+                        <p>Your tracking code is:</p>
+                        <div class="tracking-code-display">@TempData["TrackingCode"]</div>
+                        <p class="success-note">Save this code to track your document anytime in History Logs.</p>
+                        <a href="/Admin/SubDoc" class="submit-another">Submit another document</a>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="submit-layout">
+
+                    <!-- LEFT SIDE - FORM -->
+                    <div class="submit-card">
+                        <form method="post" asp-action="SubDoc">
+
+                            <div class="form-group">
+                                <label>Document Name <span class="required">*</span></label>
+                                <input type="text" name="DocumentName" placeholder="e.g. Budget Proposal FY2025" required autocomplete="off" />
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>From Department <span class="required">*</span></label>
+                                    <select name="FromOffice" required autocomplete="off">
+                                        <option value="">Select department</option>
+                                        <option value="Accounting">Accounting</option>
+                                        <option value="Accreditation and Quality Assurance">Accreditation and Quality Assurance</option>
+                                        <option value="Admin Office">Admin Office</option>
+                                        <option value="Assistant Campus Director's / Dean of Instruction">Assistant Campus Director's / Dean of Instruction</option>
+                                        <option value="BAC Office">BAC Office</option>
+                                        <option value="BSFI Department">BSFI Department</option>
+                                        <option value="BSIT Department">BSIT Department</option>
+                                        <option value="Campus Director">Campus Director</option>
+                                        <option value="Campus Secretary">Campus Secretary</option>
+                                        <option value="Canteen">Canteen</option>
+                                        <option value="Cashier">Cashier</option>
+                                        <option value="Civil Security Services">Civil Security Services</option>
+                                        <option value="Clinic">Clinic</option>
+                                        <option value="COA">COA</option>
+                                        <option value="College of Education">College of Education</option>
+                                        <option value="College of Technology & Engineering">College of Technology & Engineering</option>
+                                        <option value="DOST">DOST</option>
+                                        <option value="Extension Services">Extension Services</option>
+                                        <option value="Gender and Development">Gender and Development</option>
+                                        <option value="Graduate Studies">Graduate Studies</option>
+                                        <option value="Guidance Counselor">Guidance Counselor</option>
+                                        <option value="HM Department">HM Department</option>
+                                        <option value="Hometel">Hometel</option>
+                                        <option value="HRMO">HRMO</option>
+                                        <option value="IAI/SIAP (Maam Mantos)">IAI/SIAP (Maam Mantos)</option>
+                                        <option value="ICPA">ICPA</option>
+                                        <option value="Library">Library</option>
+                                        <option value="Maintenance/Carpentry">Maintenance/Carpentry</option>
+                                        <option value="MIS Assessment">MIS Assessment</option>
+                                        <option value="MIS Office">MIS Office</option>
+                                        <option value="NSTP">NSTP</option>
+                                        <option value="PACD/Guardhouse">PACD/Guardhouse</option>
+                                        <option value="Production Department">Production Department</option>
+                                        <option value="Research and Development">Research and Development</option>
+                                        <option value="Resource Generation">Resource Generation</option>
+                                        <option value="Smart Room">Smart Room</option>
+                                        <option value="SSG">SSG</option>
+                                        <option value="Students Affairs Services">Students Affairs Services</option>
+                                        <option value="Supply Office">Supply Office</option>
+                                        <option value="University Registrar">University Registrar</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>To Department <span class="required">*</span></label>
+                                    <select name="ToOffice" required autocomplete="off">
+                                        <option value="">Select department</option>
+                                        <option value="Accounting">Accounting</option>
+                                        <option value="Accreditation and Quality Assurance">Accreditation and Quality Assurance</option>
+                                        <option value="Admin Office">Admin Office</option>
+                                        <option value="Assistant Campus Director's / Dean of Instruction">Assistant Campus Director's / Dean of Instruction</option>
+                                        <option value="BAC Office">BAC Office</option>
+                                        <option value="BSFI Department">BSFI Department</option>
+                                        <option value="BSIT Department">BSIT Department</option>
+                                        <option value="Campus Director">Campus Director</option>
+                                        <option value="Campus Secretary">Campus Secretary</option>
+                                        <option value="Canteen">Canteen</option>
+                                        <option value="Cashier">Cashier</option>
+                                        <option value="Civil Security Services">Civil Security Services</option>
+                                        <option value="Clinic">Clinic</option>
+                                        <option value="COA">COA</option>
+                                        <option value="College of Education">College of Education</option>
+                                        <option value="College of Technology & Engineering">College of Technology & Engineering</option>
+                                        <option value="DOST">DOST</option>
+                                        <option value="Extension Services">Extension Services</option>
+                                        <option value="Gender and Development">Gender and Development</option>
+                                        <option value="Graduate Studies">Graduate Studies</option>
+                                        <option value="Guidance Counselor">Guidance Counselor</option>
+                                        <option value="HM Department">HM Department</option>
+                                        <option value="Hometel">Hometel</option>
+                                        <option value="HRMO">HRMO</option>
+                                        <option value="IAI/SIAP (Maam Mantos)">IAI/SIAP (Maam Mantos)</option>
+                                        <option value="ICPA">ICPA</option>
+                                        <option value="Library">Library</option>
+                                        <option value="Maintenance/Carpentry">Maintenance/Carpentry</option>
+                                        <option value="MIS Assessment">MIS Assessment</option>
+                                        <option value="MIS Office">MIS Office</option>
+                                        <option value="NSTP">NSTP</option>
+                                        <option value="PACD/Guardhouse">PACD/Guardhouse</option>
+                                        <option value="Production Department">Production Department</option>
+                                        <option value="Research and Development">Research and Development</option>
+                                        <option value="Resource Generation">Resource Generation</option>
+                                        <option value="Smart Room">Smart Room</option>
+                                        <option value="SSG">SSG</option>
+                                        <option value="Students Affairs Services">Students Affairs Services</option>
+                                        <option value="Supply Office">Supply Office</option>
+                                        <option value="University Registrar">University Registrar</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Reason for Submission</label>
+                                    <select name="Reason">
+                                        <option value="For Approval">For Approval</option>
+                                        <option value="For Signature">For Signature</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Assigned To <span class="required">*</span></label>
+                                    <input type="text" name="AssignedTo" placeholder="e.g. Dir. Roberto Santos" required autocomplete="off" />
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Description</label>
+                                <textarea name="Description" rows="4" placeholder="Brief description of the document and its purpose..."></textarea>
+                            </div>
+
+                            <div class="info-note">
+                                ℹ️ A unique Tracking Code will be generated upon submission. Please keep this code for reference.
+                            </div>
+
+                            <button type="submit" class="submit-btn">Submit Document</button>
+                        </form>
+                    </div>
+
+                    <!-- RIGHT SIDE - INFO CARDS -->
+                    <div class="info-side">
+
+                        <div class="info-card">
+                            <div class="info-card-header">
+                                <span class="info-icon">🏷️</span>
+                                <h3>Tracking Code Info</h3>
+                            </div>
+                            <p>
+                                After submitting a document, the system will automatically generate a unique <strong>Tracking Code</strong> (example: DT-2026-000001).
+                            </p>
+                            <p>
+                                Keep this code safe. You can use it later to search and track the document in <strong>History Logs</strong>.
+                            </p>
+                        </div>
+
+                        <div class="info-card">
+                            <div class="info-card-header">
+                                <span class="info-icon">💡</span>
+                                <h3>Quick Tips</h3>
+                            </div>
+                            <ul class="tips-list">
+                                <li>Use a clear and specific Document Name.</li>
+                                <li>Always select the correct <strong>From</strong> and <strong>To</strong> Department.</li>
+                                <li>Choose the right Reason for Submission.</li>
+                                <li>Write a short description for better tracking.</li>
+                                <li>Save the Tracking Code after submission.</li>
+                            </ul>
+                        </div>
+
+                    </div>
+                </div>
+            }
+
+        </div>
+    </main>
+</div>

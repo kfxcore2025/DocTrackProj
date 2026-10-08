@@ -1,0 +1,246 @@
+﻿@model List<DocTrackProj.Models.AdminDocument>
+
+@{
+    ViewData["Title"] = "Receive Documents";
+}
+
+<link rel="stylesheet"
+      href="~/css/receive.css"
+      asp-append-version="true" />
+
+<div class="admin-layout">
+
+    <partial name="_AdminSidebar" />
+
+    <main class="main-content">
+
+        <header class="top-header">
+            <div>
+                <h1>Receive</h1>
+                <p>@DateTime.Now.ToString("dddd, MMMM dd, yyyy")</p>
+            </div>
+        </header>
+
+        <div class="receive-content">
+
+            <div class="receive-header">
+                <h2>Documents to Receive</h2>
+                <div class="viewing-badge">
+                    Incoming Documents
+                </div>
+            </div>
+
+            <!-- SEARCH -->
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+
+                <input type="text"
+                       id="searchInput"
+                       placeholder="Search by tracking code, name, status..."
+                       onkeyup="filterTable()" />
+            </div>
+
+            <!-- TABLE -->
+            <div class="documents-card">
+
+                <div class="table-container">
+                    <table id="receiveTable">
+
+                        <thead>
+                            <tr>
+                                <th>TRACKING CODE</th>
+                                <th>DOCUMENT NAME</th>
+                                <th>FROM</th>
+                                <th>TO</th>
+                                <th>REASON</th>
+                                <th>STATUS</th>
+                                <th>DATE SUBMITTED</th>
+                                <th>ACTION</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @if (Model != null && Model.Any())
+                            {
+                                foreach (var doc in Model)
+                                {
+                                    <tr>
+                                        <td class="tracking-code">
+                                            @doc.TrackingCode
+                                        </td>
+
+                                        <td>
+                                            @doc.DocumentName
+                                        </td>
+
+                                        <td>
+                                            @(doc.FromOffice?.OfficeName ?? "—")
+                                        </td>
+
+                                        <td>
+                                            @(doc.ToOffice?.OfficeName ?? "—")
+                                        </td>
+
+                                        <td>
+                                            @(string.IsNullOrWhiteSpace(doc.Reason)
+                                                                                ? "—"
+                                                                                : doc.Reason)
+                                </td>
+
+                                        <td>
+                                    @if (doc.Status == "Pending")
+                                            {
+                                                <span class="status pending">
+                                                    ● Pending
+                                                </span>
+                                            }
+                                            else if (doc.Status == "For Signature")
+                                            {
+                                                <span class="status signature">
+                                                    ● For Signature
+                                                </span>
+                                            }
+                                            else if (doc.Status == "In Transit")
+                                            {
+                                                <span class="status transit">
+                                                    ● In Transit
+                                                </span>
+                                            }
+                                            else if (doc.Status == "Received")
+                                            {
+                                                <span class="status received">
+                                                    ● Received
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="status">
+                                                    ● @doc.Status
+                                                </span>
+                                            }
+                                        </td>
+
+                                        <td>
+                                            @doc.DateSubmitted.ToString(
+                                            "MMM dd, yyyy hh:mm tt")
+                                </td>
+
+                                <td>
+                                    <form method="post"
+                                          asp-controller="Admin"
+                                          asp-action="MarkAsReceived"
+                                          style="display:inline;">
+
+                                        @Html.AntiForgeryToken()
+
+                                        <input type="hidden"
+                                               name="id"
+                                               value="@doc.Id" />
+
+                                        <button type="submit"
+                                                class="receive-btn">
+                                            Mark as Received
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="8" class="no-documents">
+                                        <div class="empty-state">
+                                            <div class="empty-icon">📭</div>
+
+                                            <strong>
+                                                No documents to receive
+                                            </strong>
+
+                                            <span>
+                                                There are currently no incoming
+                                                documents.
+                                            </span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+
+                    </table>
+                </div>
+
+                <div class="table-footer">
+                    Showing @(Model?.Count ?? 0)
+                    of @(Model?.Count ?? 0) records
+                </div>
+
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+        // Dark mode
+        if (localStorage.getItem("darkMode") === "enabled") {
+            document.body.classList.add("dark-mode");
+        }
+
+        // Notification popup
+        const notificationButton =
+            document.getElementById("notificationButton");
+
+        const notificationPopup =
+            document.getElementById("notificationPopup");
+
+        if (notificationButton && notificationPopup) {
+            notificationButton.addEventListener("click", function (event) {
+                event.stopPropagation();
+                notificationPopup.classList.toggle("show");
+            });
+
+            document.addEventListener("click", function (event) {
+                if (!notificationPopup.contains(event.target) &&
+    !notificationButton.contains(event.target)) {
+                    notificationPopup.classList.remove("show");
+                }
+            });
+        }
+
+        // Search filter
+        function filterTable() {
+            const input =
+                document.getElementById("searchInput");
+
+            const filter =
+                input.value.toUpperCase();
+
+            const table =
+                document.getElementById("receiveTable");
+
+            const rows =
+                table.getElementsByTagName("tr");
+
+            for (let i = 1; i < rows.length; i++) {
+                let found = false;
+
+                const cells =
+                    rows[i].getElementsByTagName("td");
+
+                for (let j = 0; j < cells.length; j++) {
+                    const cellText =
+                        cells[j].textContent ||
+                        cells[j].innerText ||
+                        "";
+
+                    if (cellText.toUpperCase().indexOf(filter) > -1) {
+                        found = true;
+                        break;
+                    }
+                }
+
+                rows[i].style.display =
+                    found? "": "none";
+            }
+        }
+</script>

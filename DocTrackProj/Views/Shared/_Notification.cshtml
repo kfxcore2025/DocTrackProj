@@ -1,0 +1,137 @@
+﻿@using DocTrackProj.Models
+
+@{
+    var notifications =
+        ViewBag.Notifications as List<AdminDocument>
+?? new List<AdminDocument>();
+
+    var notificationCount = ViewBag.NotificationCount is int count
+? count
+: 0;
+}
+
+<link rel="stylesheet"
+      href="~/css/notification.css"
+      asp-append-version="true" />
+
+<div class="notification-wrapper">
+
+    <button type="button"
+            class="notification"
+            id="notificationButton"
+            aria-label="Open notifications">
+        🔔
+
+        @if (notificationCount > 0)
+        {
+            <span class="notification-count">
+                @notificationCount
+            </span>
+        }
+    </button>
+
+    <div class="notification-popup"
+         id="notificationPopup">
+
+        <div class="notification-header">
+            <h3>Notifications</h3>
+            <span>@notificationCount</span>
+        </div>
+
+        <div class="notification-list">
+
+            @if (notifications.Any())
+            {
+                foreach (var notification in notifications)
+                {
+                    <a asp-controller="Admin"
+                       asp-action="Receive"
+                       class="notification-item">
+
+                        <div class="notification-icon">
+                            📥
+                        </div>
+
+                        <div class="notification-text">
+                            <strong>
+                                New Document to Receive
+                            </strong>
+
+                            <p>
+                                @(notification.DocumentName ?? "Untitled document")
+                                is waiting to be received.
+                            </p>
+
+                            <small>
+                                @notification.DateSubmitted.ToString(
+                                "MMM dd, yyyy hh:mm tt")
+                    </small>
+                </div>
+            </a>
+                        }
+            }
+            else
+            {
+                <div class="no-notifications">
+                    <div>🎉</div>
+                    <p>No new notifications</p>
+                </div>
+            }
+
+        </div>
+    </div>
+</div>
+
+<script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const button = document.getElementById("notificationButton");
+            const popup = document.getElementById("notificationPopup");
+            const countBadge = document.querySelector(".notification-count");
+
+            // This is rendered as an integer by Razor.
+            const currentCount = @notificationCount;
+
+            const lastSeenCount = parseInt(
+                localStorage.getItem("lastSeenNotificationCount") || "0",
+                10
+            );
+
+            // Display the badge only when there are new notifications.
+            if (countBadge) {
+                if (currentCount > lastSeenCount && currentCount > 0) {
+                    countBadge.style.display = "flex";
+                } else {
+                    countBadge.style.display = "none";
+                }
+            }
+
+            if (!button ||!popup) {
+                return;
+            }
+
+            button.addEventListener("click", function (event) {
+                event.stopPropagation();
+
+                popup.classList.toggle("show");
+
+                // Mark notifications as seen when the popup is opened.
+                if (popup.classList.contains("show")) {
+                    localStorage.setItem(
+                        "lastSeenNotificationCount",
+                        currentCount.toString()
+                    );
+
+                    if (countBadge) {
+                        countBadge.style.display = "none";
+                    }
+                }
+            });
+
+            document.addEventListener("click", function (event) {
+                if (!popup.contains(event.target) &&
+    !button.contains(event.target)) {
+                    popup.classList.remove("show");
+                }
+            });
+        });
+</script>

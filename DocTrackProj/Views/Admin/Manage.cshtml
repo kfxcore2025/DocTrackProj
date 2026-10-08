@@ -1,0 +1,324 @@
+﻿@model DocTrackProj.Models.ManageViewModel
+@{
+    ViewData["Title"] = "Manage";
+}
+
+<link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/manage.css" asp-append-version="true" />
+
+<div class="admin-layout">
+    <partial name="_AdminSidebar" />
+
+    <main class="main-content">
+        <header class="top-header">
+            <div>
+                <h1>Manage</h1>
+                <p>Manage system users and offices</p>
+            </div>
+        </header>
+
+        <div class="dashboard-body">
+
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert success">@TempData["Success"]</div>
+            }
+
+            <!-- ==================== USERS ==================== -->
+            <div class="card" style="margin-bottom: 2rem;">
+                <div class="card-header" style="display:flex; justify-content:space-between; align-items:center;">
+                    <h2 style="margin:0;">Users</h2>
+                    <button type="button" class="btn-primary" onclick="openModal('addUserModal')">+ Add User</button>
+                </div>
+
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Full Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Created</th>
+                                <th style="width:180px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var user in Model.Users)
+                            {
+                                <tr>
+                                    <td>@user.FullName</td>
+                                    <td>@user.Email</td>
+                                    <td><span class="badge">@user.Role</span></td>
+                                    <td>
+                                        @if (user.IsActive)
+                                        {
+                                            <span class="status active">Active</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="status inactive">Inactive</span>
+                                        }
+                                    </td>
+                                    <td>@user.CreatedAt.ToString("MMM dd, yyyy")</td>
+                                    <td class="actions">
+                                        <button type="button" class="btn-sm"
+                                                onclick="openEditUserModal(@user.Id, '@user.FullName', '@user.Email', '@user.Role', @user.IsActive.ToString().ToLower())">
+                                            Edit
+                                        </button>
+
+                                        <form asp-action="ToggleUserActive" method="post" style="display:inline;">
+                                            <input type="hidden" name="id" value="@user.Id" />
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn-sm @(user.IsActive ? "btn-warning" : "btn-success")">
+                                                @(user.IsActive ? "Deactivate" : "Activate")
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ==================== OFFICES ==================== -->
+            <div class="card">
+                <div class="card-header" style="display:flex; justify-content:space-between; align-items:center;">
+                    <h2 style="margin:0;">Offices / Departments</h2>
+                    <button type="button" class="btn-primary" onclick="openModal('addOfficeModal')">+ Add Office</button>
+                </div>
+
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Office Name</th>
+                                <th>Room Number</th>
+                                <th>Status</th>
+                                <th style="width:180px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var office in Model.Offices)
+                            {
+                                <tr>
+                                    <td>@office.OfficeName</td>
+                                    <td>@office.RoomNumber</td>
+                                    <td>
+                                        @if (office.IsActive)
+                                        {
+                                            <span class="status active">Active</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="status inactive">Inactive</span>
+                                        }
+                                    </td>
+                                    <td class="actions">
+                                        <button type="button" class="btn-sm"
+                                                onclick="openEditOfficeModal(@office.Id, '@office.OfficeName', '@office.RoomNumber', @office.IsActive.ToString().ToLower())">
+                                            Edit
+                                        </button>
+
+                                        <form asp-action="ToggleOfficeActive" method="post" style="display:inline;">
+                                            <input type="hidden" name="id" value="@office.Id" />
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn-sm @(office.IsActive ? "btn-warning" : "btn-success")">
+                                                @(office.IsActive ? "Deactivate" : "Activate")
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </main>
+</div>
+
+<!-- ==================== MODALS ==================== -->
+<!-- ADD USER MODAL -->
+<div id="addUserModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Add New User</h2>
+            <button type="button" class="close-btn" onclick="closeModal('addUserModal')">&times;</button>
+        </div>
+        <form asp-action="CreateUser" method="post">
+            @Html.AntiForgeryToken()
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input name="FullName" class="form-control" required />
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input name="Email" type="email" class="form-control" required />
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input name="password" type="password" class="form-control" required />
+                </div>
+                <div class="form-group">
+                    <label>Role</label>
+                    <select name="Role" class="form-control" required>
+                        <option value="">-- Select Role --</option>
+                        <option value="Administrator">Administrator</option>
+                        <option value="Staff">Staff</option>
+                        <option value="Encoder">Encoder</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="closeModal('addUserModal')">Cancel</button>
+                <button type="submit" class="btn-primary">Create User</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- EDIT USER MODAL -->
+<div id="editUserModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Edit User</h2>
+            <button type="button" class="close-btn" onclick="closeModal('editUserModal')">&times;</button>
+        </div>
+        <form asp-action="EditUser" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="Id" id="editUserId" />
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input name="FullName" id="editUserFullName" class="form-control" required />
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input name="Email" id="editUserEmail" type="email" class="form-control" required />
+                </div>
+                <div class="form-group">
+                    <label>New Password (leave blank to keep current)</label>
+                    <input name="newPassword" type="password" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label>Role</label>
+                    <select name="Role" id="editUserRole" class="form-control" required>
+                        <option value="Administrator">Administrator</option>
+                        <option value="Staff">Staff</option>
+                        <option value="Encoder">Encoder</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="IsActive" id="editUserIsActive" value="true" /> Active
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="closeModal('editUserModal')">Cancel</button>
+                <button type="submit" class="btn-primary">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ADD OFFICE MODAL -->
+<div id="addOfficeModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Add New Office</h2>
+            <button type="button" class="close-btn" onclick="closeModal('addOfficeModal')">&times;</button>
+        </div>
+        <form asp-action="CreateOffice" method="post">
+            @Html.AntiForgeryToken()
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Office Name</label>
+                    <input name="OfficeName" class="form-control" required />
+                </div>
+                <div class="form-group">
+                    <label>Room Number</label>
+                    <input name="RoomNumber" class="form-control" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="closeModal('addOfficeModal')">Cancel</button>
+                <button type="submit" class="btn-primary">Create Office</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- EDIT OFFICE MODAL -->
+<div id="editOfficeModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Edit Office</h2>
+            <button type="button" class="close-btn" onclick="closeModal('editOfficeModal')">&times;</button>
+        </div>
+        <form asp-action="EditOffice" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="Id" id="editOfficeId" />
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Office Name</label>
+                    <input name="OfficeName" id="editOfficeName" class="form-control" required />
+                </div>
+                <div class="form-group">
+                    <label>Room Number</label>
+                    <input name="RoomNumber" id="editOfficeRoom" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="IsActive" id="editOfficeIsActive" value="true" /> Active
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="closeModal('editOfficeModal')">Cancel</button>
+                <button type="submit" class="btn-primary">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openModal(id) {
+        document.getElementById(id).classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal(id) {
+        document.getElementById(id).classList.remove('show');
+        document.body.style.overflow = '';
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function (event) {
+        if (event.target.classList.contains('modal')) {
+            event.target.classList.remove('show');
+            document.body.style.overflow = '';
+        }
+    }
+
+    function openEditUserModal(id, fullName, email, role, isActive) {
+        document.getElementById('editUserId').value = id;
+        document.getElementById('editUserFullName').value = fullName;
+        document.getElementById('editUserEmail').value = email;
+        document.getElementById('editUserRole').value = role;
+        document.getElementById('editUserIsActive').checked = isActive === true || isActive === 'true';
+        openModal('editUserModal');
+    }
+
+    function openEditOfficeModal(id, name, room, isActive) {
+        document.getElementById('editOfficeId').value = id;
+        document.getElementById('editOfficeName').value = name;
+        document.getElementById('editOfficeRoom').value = room;
+        document.getElementById('editOfficeIsActive').checked = isActive === true || isActive === 'true';
+        openModal('editOfficeModal');
+    }
+</script>

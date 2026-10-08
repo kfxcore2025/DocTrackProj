@@ -1,0 +1,31 @@
+﻿@model DocTrackProj.Models.Office
+@{
+    ViewData["Title"] = "Add Office";
+}
+<link rel="stylesheet" href="~/css/manage.css" asp-append-version="true" />
+
+<div class="main-content">
+    <div class="page-header"><h1>Add New Office</h1></div>
+
+    <div class="card" style="max-width:500px;">
+        <form asp-action="CreateOffice" method="post">
+            @Html.AntiForgeryToken()
+
+            <div class="form-group">
+                <label asp-for="OfficeName"></label>
+                <input asp-for="OfficeName" class="form-control" />
+                <span asp-validation-for="OfficeName" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="RoomNumber"></label>
+                <input asp-for="RoomNumber" class="form-control" />
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">Create Office</button>
+                <a href="/Admin/Manage" class="btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>

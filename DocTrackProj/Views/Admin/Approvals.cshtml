@@ -1,0 +1,180 @@
+﻿@model IEnumerable<DocTrackProj.Models.Document>
+
+@{
+    ViewData["Title"] = "For Approval";
+    var notifications = ViewBag.Notifications as List<DocTrackProj.Models.Document>;
+    var notificationCount = ViewBag.NotificationCount ?? 0;
+    var pendingCount = ViewBag.PendingDocuments ?? 0;
+    var forSignatureCount = ViewBag.ForSignatureDocuments ?? 0;
+}
+
+<link rel="stylesheet"
+      href="~/css/approval.css"
+      asp-append-version="true" />
+
+<div class="admin-layout">
+
+    <!-- SIDEBAR -->
+
+    <partial name="_AdminSidebar" />
+
+    <!-- ===================== MAIN CONTENT ===================== -->
+    <main class="main-content">
+
+        <header class="top-header">
+            <div>
+                <h1>For Approval</h1>
+                <p>@DateTime.Now.ToString("dddd, MMMM d, yyyy")</p>
+            </div>
+
+            <!-- REAL-TIME NOTIFICATION BELL -->
+            <div class="notification-wrapper">
+                <button class="notification" type="button" onclick="toggleNotification()">
+                    🔔
+                    @if (notificationCount > 0)
+                    {
+                        <span class="notification-count">@notificationCount</span>
+                    }
+                </button>
+
+                <div class="notification-popup" id="notificationPopup">
+                    <div class="notification-header">
+                        <h3>Notifications</h3>
+                        @if (notificationCount > 0)
+                        {
+                            <span>@notificationCount</span>
+                        }
+                    </div>
+
+                    <div class="notification-list">
+                        @if (notifications != null && notifications.Any())
+                        {
+                            @foreach (var notif in notifications)
+                            {
+                                <div class="notification-item">
+                                    <div class="notification-icon">📄</div>
+                                    <div class="notification-text">
+                                        <strong>@(notif.DocumentName ?? "Document")</strong>
+                                        <p>
+                                            Status: @notif.Status
+                                            @if (notif.FromOffice != null)
+                                            {
+                                                <text> • From: @notif.FromOffice.OfficeName</text>
+                                            }
+                                        </p>
+                                        <small>@notif.DateSubmitted.ToString("MMM dd, yyyy hh:mm tt")</small>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="no-notifications">
+                                No new notifications
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="approval-content">
+
+            <div class="approval-page-header">
+                <div>
+                    <h2>Documents for Approval</h2>
+                    <p>Review and approve documents assigned to you</p>
+                </div>
+            </div>
+
+            <div class="documents-card">
+                <div class="documents-header">
+                    <h2>Documents for Approval</h2>
+
+                    <div class="search-box">
+                        <span class="search-icon">🔍</span>
+                        <input type="text"
+                               id="searchInput"
+                               placeholder="Search by tracking code, name, status..."
+                               onkeyup="filterTable()" />
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table id="approvalTable">
+                        <thead>
+                            <tr>
+                                <th>TRACKING CODE</th>
+                                <th>DOCUMENT NAME</th>
+                                <th>FROM DEPARTMENT</th>
+                                <th>ASSIGNED TO</th>
+                                <th>STATUS</th>
+                                <th>DATE SUBMITTED</th>
+                                <th>ACTIONS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model != null && Model.Any())
+                            {
+                                @foreach (var doc in Model)
+                                {
+                                    <tr>
+                                        <td class="tracking-code">@(doc.TrackingCode ?? "N/A")</td>
+                                        <td>@(doc.DocumentName ?? "Untitled")</td>
+                                        <td>@(doc.FromOffice?.OfficeName ?? "N/A")</td>
+                                        <td>@(doc.ToOffice?.OfficeName ?? "N/A")</td>
+                                        <td>
+                                            <span class="status @doc.Status?.ToLower()">@doc.Status</span>
+                                        </td>
+                                        <td>@doc.DateSubmitted.ToString("MMM dd, yyyy hh:mm tt")</td>
+                                        <td>
+                                            <button class="action-button view-button">View</button>
+                                            <button class="action-button approve-button">Approve</button>
+                                            <button class="action-button reject-button">Reject</button>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="7" class="no-documents">
+                                        <div class="empty-state-content">
+                                            <div class="empty-icon">📄</div>
+                                            <strong>No documents for approval</strong>
+                                            <span>There are currently no documents waiting for your approval.</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    function toggleNotification() {
+        document.getElementById('notificationPopup').classList.toggle('show');
+    }
+
+    document.addEventListener('click', function (e) {
+        const wrapper = document.querySelector('.notification-wrapper');
+        const popup = document.getElementById('notificationPopup');
+        if (wrapper && !wrapper.contains(e.target)) {
+            popup.classList.remove('show');
+        }
+    });
+
+    function filterTable() {
+        const filter = document.getElementById('searchInput').value.toUpperCase();
+        const rows = document.querySelectorAll('#approvalTable tbody tr');
+
+        rows.forEach(row => {
+            const text = row.textContent.toUpperCase();
+            row.style.display = text.includes(filter) ? '' : 'none';
+        });
+    }
+</script>

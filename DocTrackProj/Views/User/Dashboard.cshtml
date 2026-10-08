@@ -1,0 +1,123 @@
+﻿@{
+    ViewData["Title"] = "User Dashboard";
+    var recentDocuments = ViewBag.RecentDocuments as List<DocTrackProj.Models.Document>;
+}
+<link rel="stylesheet" href="~/css/user-dashboard.css" asp-append-version="true" />
+<div class="admin-layout">
+    <partial name="_UserSidebar" />
+    <main class="main-content">
+        <header class="top-header">
+            <div>
+                <h1>Dashboard</h1>
+                <p>@DateTime.Now.ToString("dddd, MMMM dd, yyyy")</p>
+            </div>
+            <partial name="_UserNotification" />
+        </header>
+        <div class="dashboard-content">
+            <!-- STATS CARDS -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon total">📄</div>
+                    <div>
+                        <h3>@ViewBag.TotalDocuments</h3>
+                        <p>Total Documents</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon pending">⏳</div>
+                    <div>
+                        <h3>@ViewBag.PendingDocuments</h3>
+                        <p>Pending</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon received">📥</div>
+                    <div>
+                        <h3>@ViewBag.ReceivedDocuments</h3>
+                        <p>Received</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon signature">✎</div>
+                    <div>
+                        <h3>@ViewBag.ForSignatureDocuments</h3>
+                        <p>For Signature</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RECENT DOCUMENTS -->
+            <div class="documents-card">
+                <div class="documents-header">
+                    <h2>Recent Documents</h2>
+                    <a asp-controller="User" asp-action="MyDocuments">View All →</a>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>TRACKING CODE</th>
+                                <th>DOCUMENT NAME</th>
+                                <th>FROM</th>
+                                <th>TO</th>
+                                <th>STATUS</th>
+                                <th>DATE</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (recentDocuments != null && recentDocuments.Any())
+                            {
+                                foreach (var doc in recentDocuments)
+                                {
+                                    <tr>
+                                        <td class="tracking-code">@doc.TrackingCode</td>
+                                        <td>@doc.DocumentName</td>
+                                        <td>@(doc.FromOffice?.OfficeName ?? "—")</td>
+                                        <td>@(doc.ToOffice?.OfficeName ?? "—")</td>
+                                        <td>
+                                            @if (doc.Status == "Pending")
+                                            {
+                                                <span class="status pending">● Pending</span>
+                                            }
+                                            else if (doc.Status == "Received")
+                                            {
+                                                <span class="status received">● Received</span>
+                                            }
+                                            else if (doc.Status == "For Signature")
+                                            {
+                                                <span class="status signature">● For Signature</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="status">● @doc.Status</span>
+                                            }
+                                        </td>
+                                        <td>@doc.DateSubmitted.ToString("MMM dd, yyyy")</td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="6" class="no-documents">
+                                        <div class="empty-state">
+                                            <div class="empty-icon">📭</div>
+                                            <strong>No documents yet</strong>
+                                            <span>Documents you submit or receive will appear here.</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+<script>
+    // User-specific Dark Mode (does not affect Admin)
+    if (localStorage.getItem("darkMode_user") === "enabled") {
+        document.body.classList.add("dark-mode");
+    }
+</script>

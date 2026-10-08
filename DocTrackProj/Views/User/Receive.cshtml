@@ -1,0 +1,141 @@
+﻿@model List<DocTrackProj.Models.UserDocument>
+@{
+    ViewData["Title"] = "Receive";
+}
+
+<link rel="stylesheet"
+      href="~/css/user-receive.css"
+      asp-append-version="true" />
+
+<div class="admin-layout">
+
+    <partial name="_UserSidebar" />
+
+    <main class="main-content">
+        <header class="top-header">
+            <div>
+                <h1>Receive</h1>
+                <p>@DateTime.Now.ToString("dddd, MMMM dd, yyyy")</p>
+            </div>
+            <partial name="_UserNotification" />
+        </header>
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert-success">@TempData["Success"]</div>
+        }
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert-error">@TempData["Error"]</div>
+        }
+
+        <div class="receive-content">
+            <div class="history-header">
+                <h2>Documents to Receive</h2>
+                <div class="viewing-badge">Incoming Documents</div>
+            </div>
+
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text"
+                       id="searchInput"
+                       placeholder="Search by tracking code, name, status..." />
+            </div>
+
+            <div class="documents-card">
+                <div class="table-container">
+                    <table id="documentsTable">
+                        <thead>
+                            <tr>
+                                <th>TRACKING CODE</th>
+                                <th>DOCUMENT NAME</th>
+                                <th>FROM</th>
+                                <th>REASON</th>
+                                <th>STATUS</th>
+                                <th>DATE & TIME</th>
+                                <th>ACTION</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model == null || !Model.Any())
+                            {
+                                <tr>
+                                    <td colspan="7" class="no-documents">
+                                        <div class="empty-state">
+                                            <div class="empty-icon">📭</div>
+                                            <strong>No documents to receive</strong>
+                                            <span>No pending documents are assigned to your office.</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                            else
+                            {
+                                foreach (var document in Model)
+                                {
+                                    <tr>
+                                        <td class="tracking-code">@document.TrackingCode</td>
+                                        <td>@document.DocumentName</td>
+                                        <td>@(document.FromOffice?.OfficeName ?? "—")</td>
+                                        <td>@(string.IsNullOrWhiteSpace(document.Reason) ? "—" : document.Reason)</td>
+                                        <td>
+                                            @if (document.Status == "Pending")
+                                            {
+                                                <span class="status pending">● Pending</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="status">● @document.Status</span>
+                                            }
+                                        </td>
+                                        <td>@document.DateSubmitted.ToString("MMM dd, yyyy hh:mm tt")</td>
+                                        <td>
+                                            @if (document.Status == "Pending")
+                                            {
+                                                <form asp-controller="User"
+                                                      asp-action="MarkAsReceived"
+                                                      method="post"
+                                                      style="display:inline;">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="id" value="@document.Id" />
+                                                    <button type="submit" class="receive-btn">Mark as Received</button>
+                                                </form>
+                                            }
+                                            else
+                                            {
+                                                <span>—</span>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+</div>   <!-- ✅ missing div added here -->
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const searchInput = document.getElementById("searchInput");
+        const table = document.getElementById("documentsTable");
+        if (!searchInput || !table) return;
+
+        searchInput.addEventListener("keyup", function () {
+            const searchText = searchInput.value.toLowerCase();
+            const rows = table.querySelectorAll("tbody tr");
+            rows.forEach(function (row) {
+                const rowText = row.textContent.toLowerCase();
+                row.style.display = rowText.includes(searchText) ? "" : "none";
+            });
+        });
+    });
+
+    if (localStorage.getItem("userDarkMode") === "enabled") {
+        document.body.classList.add("dark-mode");
+    }
+</script>

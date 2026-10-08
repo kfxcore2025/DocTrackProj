@@ -1,0 +1,317 @@
+﻿/* ==============================
+   PARTICLES & MOUSE TRAIL
+   ============================== */
+#particles-js {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 0;
+    background: #081C3A;
+    background-image: radial-gradient(800px 400px at 20% -10%, rgba(99,102,241,0.28), transparent), radial-gradient(600px 300px at 80% 20%, rgba(16,185,129,0.15), transparent), radial-gradient(700px 500px at 50% 100%, rgba(99,102,241,0.12), transparent);
+}
+
+#mouse-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.particles-overlay {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    background: radial-gradient(ellipse at center, transparent 35%, rgba(8,28,58,0.75) 100%);
+    pointer-events: none;
+}
+
+/* ==============================
+   MAIN LAYOUT
+   ============================== */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #081C3A;
+    overflow-x: hidden;
+}
+
+.login-container {
+    position: relative;
+    z-index: 2;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 30px;
+}
+
+.brand {
+    text-align: center;
+    color: white;
+    margin-bottom: 28px;
+}
+
+    .brand h1 {
+        font-size: 50px;
+        font-weight: 900;
+        margin-bottom: 6px;
+        letter-spacing: -1px;
+    }
+
+    .brand p {
+        color: #c3cfe2;
+        font-size: 14px;
+    }
+
+.glow-text {
+    text-shadow: 0 0 25px rgba(99,102,241,1), 0 0 50px rgba(99,102,241,0.6), 0 0 80px rgba(99,102,241,0.35);
+    animation: glowPulse 2.5s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+    0%,100% {
+        text-shadow: 0 0 25px rgba(99,102,241,1), 0 0 50px rgba(99,102,241,0.6);
+    }
+
+    50% {
+        text-shadow: 0 0 40px rgba(99,102,241,1), 0 0 80px rgba(99,102,241,0.8), 0 0 100px rgba(99,102,241,0.5);
+    }
+}
+
+/* ==============================
+   TRANSPARENT GLASS BOX
+   ============================== */
+.login-card {
+    width: 100%;
+    max-width: 470px;
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border-radius: 22px;
+    padding: 32px 36px;
+    border: 1px solid rgba(255,255,255,0.18);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.08) inset, 0 0 40px rgba(99,102,241,0.18);
+}
+
+    .login-card h2 {
+        font-weight: 800;
+        font-size: 28px;
+        margin-bottom: 6px;
+        color: #ffffff;
+        letter-spacing: -0.5px;
+        text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+
+.subtitle {
+    color: #b8c6de;
+    margin-bottom: 22px;
+    font-size: 14px;
+}
+
+/* ==============================
+   GLOWING TABS - TRANSPARENT
+   ============================== */
+.auth-tabs {
+    display: flex;
+    gap: 8px;
+    padding: 6px;
+    background: rgba(0,0,0,0.25);
+    border-radius: 14px;
+    margin-bottom: 26px;
+    border: 1px solid rgba(255,255,255,0.12);
+    backdrop-filter: blur(10px);
+}
+
+.tab {
+    flex: 1;
+    text-align: center;
+    padding: 10px 8px;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    font-weight: 700;
+    font-size: 13px;
+    color: #8fa0bf;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+    .tab.active {
+        background: rgba(255,255,255,0.95);
+        color: #0A2A5E;
+        border-color: rgba(255,255,255,0.5);
+        box-shadow: 0 0 22px rgba(99,102,241,0.45), 0 4px 14px rgba(0,0,0,0.25);
+        transform: translateY(-1px);
+    }
+
+    .tab:hover {
+        background: rgba(255,255,255,0.15);
+        color: #ffffff;
+    }
+
+    .tab.active:hover {
+        background: #ffffff;
+        color: #0A2A5E;
+    }
+
+/* ==============================
+   INPUTS - TRANSPARENT
+   ============================== */
+.form-label {
+    font-weight: 600;
+    font-size: 13px;
+    color: #d4ddf0;
+    margin-bottom: 6px;
+}
+
+.form-control {
+    height: 52px;
+    border-radius: 12px;
+    border: 1.5px solid rgba(255,255,255,0.18);
+    font-size: 14px;
+    transition: all 0.25s ease;
+    background: rgba(0,0,0,0.25);
+    color: #ffffff;
+    backdrop-filter: blur(8px);
+}
+
+    .form-control::placeholder {
+        color: #8fa0bf;
+    }
+
+    .form-control:focus {
+        background: rgba(0,0,0,0.35);
+        box-shadow: 0 0 0 3px rgba(99,102,241,0.25), 0 0 22px rgba(99,102,241,0.35);
+        border-color: rgba(99,102,241,0.6);
+        color: #ffffff;
+        outline: none;
+    }
+
+    .form-control option {
+        background: #0A1931;
+        color: white;
+    }
+
+.input-glow-wrapper {
+    position: relative;
+}
+
+.input-icon {
+    position: absolute;
+    left: 14px;
+    top: 16px;
+    z-index: 2;
+    font-size: 13px;
+    filter: drop-shadow(0 0 8px rgba(99,102,241,1));
+    pointer-events: none;
+}
+
+.form-control.has-icon {
+    padding-left: 40px;
+}
+
+/* ==============================
+   BUTTON
+   ============================== */
+.btn-login {
+    height: 52px;
+    border-radius: 12px;
+    border: none;
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+    color: white;
+    font-weight: 700;
+    font-size: 15px;
+    box-shadow: 0 10px 24px rgba(99,102,241,0.45), 0 0 30px rgba(99,102,241,0.25);
+    transition: all 0.25s ease;
+}
+
+    .btn-login:hover {
+        background: linear-gradient(135deg, #7c7eff, #6366f1);
+        color: #fff;
+        transform: translateY(-2px);
+        box-shadow: 0 16px 36px rgba(99,102,241,0.6), 0 0 40px rgba(99,102,241,0.45);
+    }
+
+/* ==============================
+   ANIMATIONS & FOOTER
+   ============================== */
+.animate-in {
+    animation: slideIn 0.55s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(16px) scale(0.97);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+footer {
+    margin-top: 28px;
+    color: #8fa0bf;
+    font-size: 12px;
+    z-index: 2;
+    position: relative;
+}
+
+.alert {
+    border-radius: 12px;
+    font-size: 13px;
+    backdrop-filter: blur(10px);
+}
+
+.alert-success {
+    background: rgba(16,185,129,0.15);
+    border: 1px solid rgba(16,185,129,0.3);
+    color: #a7f3d0;
+}
+
+.alert-danger {
+    background: rgba(239,68,68,0.15);
+    border: 1px solid rgba(239,68,68,0.3);
+    color: #fecaca;
+}
+
+/* Real-time Clock - Upper Left */
+.realtime-clock {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background: rgba(21, 26, 54, 0.9);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 10px 16px;
+    color: white;
+    font-family: 'Courier New', monospace;
+    z-index: 9999;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+
+    .realtime-clock .time {
+        font-size: 18px;
+        font-weight: 700;
+        color: #5a5cff;
+        letter-spacing: 1px;
+    }
+
+    .realtime-clock .date {
+        font-size: 11px;
+        color: #8a8fb5;
+        margin-top: 2px;
+    }

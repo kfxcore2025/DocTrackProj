@@ -1,0 +1,291 @@
+﻿@model DocTrackProj.Models.LoginViewModel
+@{
+    ViewData["Title"] = "Sign In";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CTU Document Tracking System</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/login.css" />
+    <style>
+        .password-wrapper {
+            position: relative;
+        }
+
+        .eye-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            z-index: 3;
+            padding: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #a8b6cf;
+        }
+
+            .eye-btn svg {
+                width: 22px;
+                height: 22px;
+            }
+
+        /* DATE & TIME - UPPER RIGHT TOP - NO BOX */
+        .realtime-clock {
+            position: fixed;
+            top: 16px;
+            right: 24px;
+            left: auto;
+            z-index: 9999;
+            background: none !important;
+            border: none !important;
+            box-shadow: none !important;
+            backdrop-filter: none !important;
+            padding: 0;
+            text-align: right;
+            pointer-events: none;
+        }
+
+            .realtime-clock.time {
+                font-size: 20px;
+                font-weight: 800;
+                color: #e0e7ff;
+                letter-spacing: 1px;
+                text-shadow: 0 0 12px rgba(99,102,241,0.8);
+            }
+
+            .realtime-clock.date {
+                font-size: 11px;
+                color: #94a3b8;
+                margin-top: 2px;
+            }
+
+        /* BRAND WITH BIG LOGO - LIKE YOUR REFERENCE */
+        .brand {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .brand-logo-wrap {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 26px;
+        }
+
+            .brand-logo-wrap img {
+                width: 145px;
+                height: 145px;
+                object-fit: contain;
+                filter: drop-shadow(0 0 18px rgba(99,102,241,0.7));
+            }
+
+        .brand-text {
+            text-align: left;
+            border-left: 3px solid #fbbf24;
+            padding-left: 18px;
+        }
+
+            .brand-text h1 {
+                margin: 0;
+                font-size: 56px;
+                font-weight: 900;
+                color: #fff;
+                line-height: 1;
+                letter-spacing: 1px;
+            }
+
+            .brand-text h2 {
+                margin: 0;
+                font-size: 20px;
+                font-weight: 800;
+                color: #fff;
+                letter-spacing: 0.5px;
+            }
+
+            .brand-text h3 {
+                margin: 0;
+                font-size: 18px;
+                font-weight: 700;
+                color: #fbbf24;
+                letter-spacing: 5px;
+            }
+
+        .brand-sub {
+            margin-top: 12px;
+            font-size: 13px;
+            color: #9fb0cc;
+            letter-spacing: 0.3px;
+        }
+
+        /* BACKGROUND */
+        #particles-js {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+        }
+
+        #mouse-canvas {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .particles-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 2;
+            pointer-events: none;
+            background: radial-gradient(circle at center, transparent 0%, rgba(3,7,18,0.4) 100%);
+        }
+
+        .login-container {
+            position: relative;
+            z-index: 3;
+        }
+    </style>
+</head>
+<body>
+    <!-- DATE & TIME UPPER RIGHT -->
+    <div class="realtime-clock">
+        <div class="time" id="liveTime">00:00:00 AM</div>
+        <div class="date" id="liveDate">Loading...</div>
+    </div>
+
+    <!-- BACKGROUND DESIGN + PARTICLES -->
+    <div id="particles-js"></div>
+    <canvas id="mouse-canvas"></canvas>
+    <div class="particles-overlay"></div>
+
+    <div class="login-container">
+        <!-- LOGO + TITLE LIKE YOUR REFERENCE -->
+        <div class="brand">
+            <div class="brand-logo-wrap">
+                <img src="~/images/ctu-logo.png" alt="CTU Logo" />
+                <div class="brand-text">
+                    <h1>CTU</h1>
+                    <h2>DOCUMENT TRACKING</h2>
+                    <h3>SYSTEM</h3>
+                </div>
+            </div>
+            <div class="brand-sub">Cebu Technological University – Daanbantayan Campus</div>
+        </div>
+
+        <div class="login-card animate-in">
+            <div class="auth-tabs">
+                <button type="button" class="tab active" onclick="showTab('login', this)">Sign In</button>
+                <button type="button" class="tab" onclick="showTab('register', this)">Sign Up</button>
+                <button type="button" class="tab" onclick="showTab('forgot', this)">Forgot?</button>
+            </div>
+
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success py-2">@TempData["Success"]</div>
+            }
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger py-2">@TempData["Error"]</div>
+            }
+
+            <div id="loginTab">
+                <h2>Sign In</h2>
+                <p class="subtitle">Enter your credentials to continue.</p>
+                <form asp-controller="Account" asp-action="Login" method="post">
+                    @Html.AntiForgeryToken()
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label">Email Address</label>
+                        <div class="input-glow-wrapper"><span class="input-icon">✉</span><input asp-for="Email" class="form-control has-icon" placeholder="e.g. you@ctu.edu.ph" /></div>
+                    </div>
+                    <div class="mb-4">
+                        <label asp-for="Password" class="form-label">Password</label>
+                        <div class="input-glow-wrapper password-wrapper">
+                            <span class="input-icon">🔒</span>
+                            <input asp-for="Password" type="password" id="loginPass" class="form-control has-icon" placeholder="Enter password" style="padding-right:44px" />
+                            <button type="button" class="eye-btn" id="btn-loginPass" onclick="toggleEye('loginPass')" tabindex="-1">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3.2" /></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <button class="btn btn-login w-100" type="submit">Sign In →</button>
+                </form>
+            </div>
+
+            <div id="registerTab" style="display:none">
+                <h2>Sign Up</h2>
+                <p class="subtitle">Position is what you are in your office/dept.</p>
+                <form asp-controller="Account" asp-action="Register" method="post">
+                    <div class="mb-3"><label class="form-label">Full Name</label><input name="FullName" class="form-control" placeholder="Juan Dela Cruz" required /></div>
+                    <div class="mb-3"><label class="form-label">Email Address</label><input name="Email" type="email" class="form-control" placeholder="you@ctu.edu.ph" required /></div>
+                    <div class="mb-3"><label class="form-label">Position in Office / Department</label><input name="Position" class="form-control" placeholder="Ex: Clerk, Secretary" required /></div>
+                    <div class="mb-3"><label class="form-label">Office / Department (40 offices)</label><select name="OfficeId" class="form-control" required><option value="">Select Office</option>@if(ViewBag.Offices!=null){foreach(var o in ViewBag.Offices){
+                    <option value="@o.Id">@o.OfficeName - @o.RoomNumber</option>
+                                        }}
+</select></div>
+                    <div class="mb-3"><label class="form-label">Password</label><div class="password-wrapper"><input name="Password" type="password" id="regPass" class="form-control" required style="padding-right:44px" /><button type="button" class="eye-btn" id="btn-regPass" onclick="toggleEye('regPass')" tabindex="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3.2" /></svg></button></div></div>
+                    <button class="btn btn-login w-100" type="submit">Create Account →</button>
+                </form>
+            </div>
+
+            <div id="forgotTab" style="display:none">
+                <h2>Forgot Password</h2>
+                <p class="subtitle">Enter email to reset.</p>
+                <form asp-controller="Account" asp-action="ForgotPassword" method="post">
+                    <div class="mb-3"><label class="form-label">Email Address</label><input name="Email" type="email" class="form-control" placeholder="you@ctu.edu.ph" required /></div>
+                    <button class="btn btn-login w-100" type="submit">Reset Password →</button>
+                </form>
+            </div>
+        </div>
+        <footer>© @DateTime.Now.Year CTU Document Tracking System. All rights reserved.</footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        // DATE TIME
+        function updateClock(){
+            const now=new Date();
+            let h=now.getHours(); const ampm=h>=12?'PM':'AM'; h=h%12||12;
+            document.getElementById('liveTime').textContent=`${String(h).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')} ${ampm}`;
+            document.getElementById('liveDate').textContent=now.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+        }
+        setInterval(updateClock,1000); updateClock();
+
+        // 200 PARTICLES BACKGROUND
+        particlesJS("particles-js", {
+            "particles": {
+                "number": { "value": 200, "density": { "enable": true, "value_area": 800 } },
+                "color": { "value": "#6366f1" },
+                "shape": { "type": "circle" },
+                "opacity": { "value": 0.6, "random": true },
+                "size": { "value": 3, "random": true },
+                "line_linked": { "enable": true, "distance": 140, "color": "#818cf8", "opacity": 0.28, "width": 1 },
+                "move": { "enable": true, "speed": 1.3, "out_mode": "out" }
+            },
+            "interactivity": {
+                "events": { "onhover": { "enable": true, "mode": "grab" }, "onclick": { "enable": true, "mode": "push" } },
+                "modes": { "grab": { "distance": 180, "line_linked": { "opacity": 0.45 } }, "push": { "particles_nb": 3 } }
+            },
+            "retina_detect": true
+        });
+
+        // MINIMAL MOUSE PARTICLES
+        const canvas=document.getElementById('mouse-canvas'); const ctx=canvas.getContext('2d');
+        canvas.width=window.innerWidth; canvas.height=window.innerHeight;
+        let particles=[];
+        window.addEventListener('resize',()=>{canvas.width=window.innerWidth; canvas.height=window.innerHeight;});
+        class Particle{constructor(x,y){this.x=x;this.y=y;this.size=Math.random()*3+1;this.speedX=(Math.random()-0.5)*1;this.speedY=(Math.random()-0.5)*1;this.life=1;this.decay=0.015;this.color=`hsl(${240+Math.random()*20},100%,70%)`;}update(){this.x+=this.speedX;this.y+=this.speedY;this.life-=this.decay;}draw(){ctx.save();ctx.globalAlpha=this.life;ctx.fillStyle=this.color;ctx.beginPath();ctx.arc(this.x,this.y,this.size,0,Math.PI*2);ctx.fill();ctx.restore();}}
+        window.addEventListener('mousemove',(e)=>{particles.push(new Particle(e.clientX,e.clientY));});
+        function animate(){ctx.clearRect(0,0,canvas.width,canvas.height);for(let i=particles.length-1;i>=0;i--){particles[i].update();particles[i].draw();if(particles[i].life<=0)particles.splice(i,1);}requestAnimationFrame(animate);}animate();
+
+        function toggleEye(id){const i=document.getElementById(id);const b=document.getElementById('btn-'+id);if(i.type==='password'){i.type='text';b.classList.add('hide');}else{i.type='password';b.classList.remove('hide');}}
+        function showTab(name,btn){document.getElementById('loginTab').style.display='none';document.getElementById('registerTab').style.display='none';document.getElementById('forgotTab').style.display='none';document.getElementById(name+'Tab').style.display='block';document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');}
+    </script>
+</body>
+</html>
